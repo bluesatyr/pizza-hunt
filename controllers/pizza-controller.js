@@ -35,14 +35,25 @@ const pizzaController = {
         Pizza.findOneAndUpdate({ _id: params.id }, body, { new: true})
             .then(dbPizzaData => {
                 if (!dbPizzaData) {
-                    res.status(404).json({ message: 'No pizza found with this id!' });
+                    res.status(404).json({ message: 'No pizza found with this id!' }); //By setting the parameter to true, we're instructing Mongoose to return the new version of the document.
                     return;
                 }
                 res.json(dbPizzaData);
             })
             .catch(err => res.status(400).json(err));
     },
-    
+    // delete pizza
+    deletePizza({ params }, res) {
+        Pizza.findOneAndDelete({ _id: params.id })
+            .then(dbPizzaData => {
+                if (!dbPizzaData) {
+                    res.status(404).json({ message: 'No pizza found with this id!' });
+                    return;
+                }
+                res.json(dbPizzaData);
+            })
+            .catch(err => res.status(400).json(err));
+    }
 }
 
 module.exports = pizzaController;
