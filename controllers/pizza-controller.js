@@ -4,15 +4,26 @@ const pizzaController = {
     // get all pizzas
     getAllPizza(req, res) {
         Pizza.find({})
-        .then(dbPizzaData => res.json(dbPizzaData))
-        .catch(err => {
-            console.log(err);
-            res.status(400).json(err);
-        });
+            .populate({
+                path: 'comments',
+                select: '-__v' // ignore the __v field on comments
+            })
+            .select('-__v') // do not include __v of Pizza 
+            .sort({ _id: -1 }) // sort in desc order by _id value
+            .then(dbPizzaData => res.json(dbPizzaData))
+            .catch(err => {
+                console.log(err);
+                res.status(400).json(err);
+            });
     },
     // get one pizza by id
     getPizzaById({ params }, res) {
         Pizza.findOne({ _id: params.id })
+        .populate({
+            path: 'comments',
+            select: '-__v' // ignore the __v field on comments
+        })
+        .select('-__v')
         .then(dbPizzaData => {
             // If no pizza is found, send 404
             if (!dbPizzaData) {
