@@ -21,6 +21,22 @@ const commentController = {
       })
       .catch(err => res.json(err));
   },
+  // add comment
+  addComment({ params, body }, res) {
+    Comment.findOneAndUpdate(
+      { _id: params.commentId },
+      { $push: { replies: body} },
+      { new: true }
+    )
+    .then(dbPizzaData => {
+      if (!dbPizzaData) {
+        res.status(404).json({ message: 'No Pizza found with this id!' });
+        return;
+      }
+      res.json(dbPizzaData);
+    })
+    .catch(err => res.json(err));
+  },
   // remove comment
   removeComment({ params }, res) {
     Comment.findOneAndDelete({ _id: params.commentId })
@@ -42,6 +58,16 @@ const commentController = {
         res.json(dbPizzaData);
       })
       .catch(err => res.json(err));
+  },
+  // remove reply
+  removeReply({ params }, res) {
+    Comment.findOneAndUpdate(
+      { _id: params.commentId },
+      { $pull: { replies: { replyId: params.replyId } } }, //removes reply by replyId
+      { new: true } // returns updated comment without deleted reply
+    )
+     .then(dbPizzaData => res.json(dbPizzaData))
+     .catch(err => res.json(err));
   }
 };
 
